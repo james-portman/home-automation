@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+  <title>Switches!</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+</head>
+<body>
+
+  <h1>Devices!</h1>
+
+  {% for device, status in devices.iteritems() %}
+  {{ device }}
+  <!-- <button type="button" class="btn btn-success">On</button>
+  <button type="button" class="btn btn-danger">Off</button> -->
+  <button id="button-{{ device }}" data-device="{{ device }}" type="button" class="btn btn-primary {{ 'active' if status.lower()=='on' }}" data-toggle="button" aria-pressed="{{ 'true' if status.lower()=='on' else 'false' }}" autocomplete="off">{{ status }}</button>
+
+  <input type="range" class="slider" data-device="{{ device }}" value="0">
+  <br/>
+  {% endfor %}
+
+<pre>
+todo dimmer percent and test?
+todo changing dimmer make switch toggle?
+reload data every so often?
+</pre>
+<!--
+  <div class="alert alert-danger" role="alert">
+    This is a danger alert—check it out!
+  </div>
+-->
+
+<!--
+good for a slider?:
+<div class="progress">
+  <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+</div>
+-->
+
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+  <script>
+  var post_url = "http://localhost:5000/toggle";
+  $("body").on("change", ".slider", function() {
+    console.log(this);
+    set_device(this.dataset.device, "on", this.value);
+  });
+
+  $("body").on("click", ".btn", function() {
+    if ($('#'+this.id).hasClass('active')) {
+      active = true;
+      // its on now so turn it off
+      action = "off";
+    } else {
+      active = false;
+      // its off now so turn it on
+      action = "on"
+    }
+    set_device(this.dataset.device, action);
+  });
+
+  function set_device(device, action, amount="") {
+    data = {
+      device: device,
+      action: action
+    }
+    if (amount != "") {
+      data.amount = amount;
+    }
+    console.log(data);
+    $.post( post_url, data, function( data ) {
+      console.log( "successful post");
+    })
+    .fail(function(data) {
+      console.log('fail');
+      alert("Failed to set device state")
+    })
+    .always(function( data ) {
+      console.log( "always post");
+    });
+  }
+  </script>
+</body>
+</html>
